@@ -6,7 +6,7 @@ interface IUser extends Document {
     password: string;
     walletAddress: string;
     refer: string;
-    createdAt: Date;
+    createdAt?: Date;
 }
 
 // Step 2: Create a Mongoose Schema
