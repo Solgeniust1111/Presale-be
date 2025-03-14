@@ -12,7 +12,7 @@ const UserRouter = Router();
 // @route    POST api/users/register
 // @desc     Register user
 // @access   Public
-UserRouter.post("/register", authMiddleware, async (req: Request, res: Response) => {
+UserRouter.post("/register", authMiddleware, async (req: AuthRequest, res: Response): Promise<any> => {
     const { walletAddress } = req.body;
     try {
         if (!walletAddress || walletAddress.trim() === "") return res.status(500).json({ msg: "Please provide a wallet address" });
@@ -23,7 +23,7 @@ UserRouter.post("/register", authMiddleware, async (req: Request, res: Response)
                 id: user._id
             }
             const token = jwt.sign(payload, JWT_SECRET);
-            return res.json({ token: token, user: user });
+            res.json({ token: token, user: user });
         }
 
         const newUser = new User({
@@ -39,17 +39,17 @@ UserRouter.post("/register", authMiddleware, async (req: Request, res: Response)
         }
         const token = jwt.sign(payload, JWT_SECRET);
 
-        return res.json({ token: token, user: newuser })
+        res.json({ token: token, user: newuser })
     } catch (error) {
         console.log("registering error => ", error);
-        return res.status(500).json({ err: error })
+        res.status(500).json({ err: error })
     }
 });
 
 // @route    POST api/users/update
 // @desc     Update user info
 // @access   Public
-UserRouter.post("/update", authMiddleware, async (req: AuthRequest, res: Response) => {
+UserRouter.post("/update", authMiddleware, async (req: AuthRequest, res: Response): Promise<any> => {
     const { walletAddress, username, about, name, socials } = req.body;
 
     try {
@@ -83,7 +83,7 @@ UserRouter.post("/update", authMiddleware, async (req: AuthRequest, res: Respons
 // @route    POST api/users/update
 // @desc     Update user info
 // @access   Public
-UserRouter.post("/update/avatar", authMiddleware, async (req: AuthRequest, res: Response, next: any) => {
+UserRouter.post("/update/avatar", authMiddleware, async (req: AuthRequest, res: Response, next: any): Promise<any> => {
     const { walletAddress, avatar } = req.body;
 
     try {
