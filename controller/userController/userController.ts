@@ -3,6 +3,7 @@ import User from "../../model/userModel/userModel";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import { JWT_SECRET } from "../../config";
+import { Keypair } from "@solana/web3.js";
 
 dotenv.config();
 
@@ -12,19 +13,19 @@ const generateToken = (id: string) => {
 
 // User Signup
 export const register = async (req: Request, res: Response): Promise<any> => {
-    const { walletAddress, name, email, password, refer, } = req.body;
+    const { walletAddress, name, email, password } = req.body;
     try {
-        if (!walletAddress || walletAddress.trim() === "") return res.status(500).json({ msg: "Please provide a wallet address" });
-        const user = await User.findOne({ walletAddress: walletAddress });
+        if (!email || email.trim() === "") return res.status(500).json({ msg: "Please provide a wallet address" });
+        const user = await User.findOne({ email: email });
         if (user) {
             const payload = {
-                walletAddress: user.walletAddress,
+                email: user.email,
                 id: user._id
             }
             const token = jwt.sign(payload, JWT_SECRET);
             res.json({ token: token, user: user });
         }
-
+        const refer = Keypair.generate().publicKey
         const newUser = new User({
             walletAddress: walletAddress,
             name: name,
