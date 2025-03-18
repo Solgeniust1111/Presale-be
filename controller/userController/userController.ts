@@ -25,7 +25,7 @@ const generateToken = (id: string) => {
 // User Signup
 export const register = async (req: Request, res: Response): Promise<any> => {
     console.log("req body => ", req.body)
-    const { walletAddress } = req.body;
+    const { walletAddress, refer } = req.body;
     try {
         if (!walletAddress || walletAddress.trim() === "") return res.status(500).json({ msg: "Please provide a wallet address" });
         const user = await User.findOne({ walletAddress: walletAddress });
@@ -34,13 +34,12 @@ export const register = async (req: Request, res: Response): Promise<any> => {
                 id: user._id
             }
             const token = jwt.sign(payload, JWT_SECRET);
-            res.json({ token: token, user: user });
+            res.json({ token: token, user: user, isExist: true });
         } else {
             const newUser = new User({
                 walletAddress: walletAddress,
-                refer: null
+                refer: refer
             });
-
             const newuser = await newUser.save();
             console.log("🚀 ~ UserRouter.post ~ newuser:", newuser)
 
@@ -49,7 +48,7 @@ export const register = async (req: Request, res: Response): Promise<any> => {
             }
             const token = jwt.sign(payload, JWT_SECRET);
 
-            res.json({ token: token, user: newuser })
+            res.json({ token: token, user: newuser, isExist: false })
         }
     } catch (error) {
         console.log("registering error => ", error);
