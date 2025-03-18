@@ -24,7 +24,6 @@ const generateToken = (id: string) => {
 
 // User Signup
 export const register = async (req: Request, res: Response): Promise<any> => {
-    console.log("req body => ", req.body)
     const { walletAddress, refer } = req.body;
     try {
         if (!walletAddress || walletAddress.trim() === "") return res.status(500).json({ msg: "Please provide a wallet address" });
@@ -41,8 +40,6 @@ export const register = async (req: Request, res: Response): Promise<any> => {
                 refer: refer
             });
             const newuser = await newUser.save();
-            console.log("🚀 ~ UserRouter.post ~ newuser:", newuser)
-
             const payload = {
                 id: newuser._id
             }
