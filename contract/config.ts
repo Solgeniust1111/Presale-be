@@ -6,7 +6,9 @@ import NodeWallet from "@coral-xyz/anchor/dist/cjs/nodewallet";
 
 const wallet = new NodeWallet(Keypair.generate())
 const connection = new Connection(process.env.RPC_ENDPOINT || process.exit(1))
-const programId = new PublicKey("4KhevSM5ymS2ABys6VwdHx3kaNq7oUK2VLvQzrQ59W24");
+// const programId = new PublicKey("4KhevSM5ymS2ABys6VwdHx3kaNq7oUK2VLvQzrQ59W24");
+
+const programId = new PublicKey("Gis8LkraTr9SZjcvU3xCwaSnhbmxAbvGMAqw7CYy7p4Y");
 const provider = new AnchorProvider(connection, wallet, { commitment: "confirmed" })
 
 

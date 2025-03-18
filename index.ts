@@ -25,7 +25,7 @@ const app = express();
 const server = http.createServer(app);
 setupSocketServer(server)
 
-const whitelist = ["http://localhost:5173", "https://bondr-new-frontend.vercel.app"];
+const whitelist = ["http://localhost:3000", "https://bondr-new-frontend.vercel.app"];
 
 // Parse incoming JSON requests using body-parser
 app.use(express.json({ limit: '50mb' }));

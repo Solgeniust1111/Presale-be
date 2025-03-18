@@ -4,7 +4,7 @@ import { AuthRequest } from "../middleware";
 import { JWT_SECRET } from "../config";
 import User from "../model/userModel/userModel";
 import { authMiddleware } from "../middleware";
-import { login, register } from "../controller/userController/userController";
+import { getReferInfo, register } from "../controller/userController/userController";
 
 
 // Create a new instance of the Express Router
@@ -14,6 +14,7 @@ const UserRouter = Router();
 // @desc     Register user
 // @access   Public
 UserRouter.post("/register", register);
-UserRouter.post("/login", login);
+// UserRouter.post("/login", login);
+UserRouter.post("/getReferInfo", getReferInfo)
 
 export default UserRouter;
