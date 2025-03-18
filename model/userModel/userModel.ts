@@ -9,7 +9,7 @@ interface IUser extends Document {
 const UserSchema: Schema<IUser> = new Schema({
 
     walletAddress: { type: String, required: true },
-    refer: { type: String, required: true }
+    refer: { type: String, required: false }
 });
 
 // Step 3: Create and export the Mongoose Model

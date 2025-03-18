@@ -7,14 +7,14 @@ import { Keypair, PublicKey } from "@solana/web3.js";
 import { program, programId } from "../../contract/config";
 
 import { publicKey } from "@coral-xyz/borsh";
-import { getUserInfoPDA } from "../../utils";
+import { getPresalePDA, getUserInfoPDA } from "../../utils";
 import { USER_SEED } from "../../config/config";
 
 dotenv.config();
 
 type ReferralResult = {
     count: number;
-    addresses: { walletAddress: string; quoteAmount: number; level: number }[];
+    addresses: { walletAddress: string; quoteAmount: number; refer: PublicKey | null, level: number }[];
 };
 
 
@@ -38,14 +38,13 @@ export const register = async (req: Request, res: Response): Promise<any> => {
         } else {
             const newUser = new User({
                 walletAddress: walletAddress,
-                refer: ""
+                refer: null
             });
 
             const newuser = await newUser.save();
             console.log("🚀 ~ UserRouter.post ~ newuser:", newuser)
 
             const payload = {
-                walletAddress: newuser.walletAddress,
                 id: newuser._id
             }
             const token = jwt.sign(payload, JWT_SECRET);
@@ -74,18 +73,21 @@ export const register = async (req: Request, res: Response): Promise<any> => {
 
 export const getReferInfo = async (req: Request, res: Response): Promise<any> => {
     const { walletAddress } = req.body;
-    console.log("🚀 ~ getReferInfo ~ walletAddress:", walletAddress)
     try {
         let bonus = 0
         const result = await getRefers(walletAddress)
+        const [presaleInfoPda] = await getPresalePDA()
+        const presaleInfoPdaData = await program.account.presaleInfo.fetch(presaleInfoPda)
+
         for (let i = 0; i < result.addresses.length; i++) {
             const walletAdd = new PublicKey(result.addresses[i].walletAddress);
             const level = result.addresses[i].level
-            console.log("result", walletAdd)
 
             const userInfoPda = await getUserInfoPDA(walletAdd)
             const userInfoPdaData = await program.account.userInfo.fetch(userInfoPda)
+
             result.addresses[i].quoteAmount = Number(userInfoPdaData.buyQuoteAmount)
+            result.addresses[i].refer = (userInfoPdaData.referer)
             if (level == 3) {
                 bonus += Number(userInfoPdaData.buyQuoteAmount) * 30 / 100
             } else if (level == 2) {
@@ -98,8 +100,8 @@ export const getReferInfo = async (req: Request, res: Response): Promise<any> =>
                 bonus += 0
             }
         }
-
-        res.status(200).json({ result: result, bonus: bonus })
+        presaleInfoPdaData.presaleSolAmount
+        res.status(200).json({ result: result, bonus: bonus, presaleInfo: presaleInfoPdaData })
     }
     catch (error) {
         console.log("getRefersError => ", error);
@@ -113,7 +115,7 @@ const getRefers = async (data: string, level = 1, result: ReferralResult = { cou
 
     users.forEach(async (user) => {
         result.count++;
-        result.addresses.push({ walletAddress: user.walletAddress, quoteAmount: 0, level })
+        result.addresses.push({ walletAddress: user.walletAddress, quoteAmount: 0, refer: null, level })
         await getRefers(user.walletAddress, level + 1, result);
     });
 
